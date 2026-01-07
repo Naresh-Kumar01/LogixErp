@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="LocalTestSuite" verbose="1">
+    <test name="LocalTests">
+        <packages>
+            <package name="*" />
+        </packages>
+    </test>
+</suite>
