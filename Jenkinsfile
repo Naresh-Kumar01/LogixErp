@@ -41,6 +41,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo '🔄 Checking out source code from GitHub...'
+                echo '🚀 Project: Logixgrid'
                 checkout scm
                 
                 // Display branch and commit info for debugging
