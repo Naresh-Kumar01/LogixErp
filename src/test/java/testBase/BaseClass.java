@@ -1,4 +1,5 @@
 package testBase;
+import java.awt.AWTException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,18 +27,33 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
+import utilities.VideoRecorder;
 public class BaseClass {
 	public static WebDriver driver;
 	public Logger logger;  //Log4j
 	public Properties p;
+	private String testClassName;
 	
 	@Parameters({"os","browser"})
 		@BeforeClass(groups= {"Sanity","Regression","Master"})
 		
-		public void setup(@Optional("linux") String os, @Optional("chrome") String browser) throws IOException
+		public void setup(@Optional("linux") String os, @Optional("chrome") String browser) throws IOException, AWTException
 		{
 			// Initialize logger first
 			logger = LogManager.getLogger(this.getClass());
+			
+			// Get test class name for video recording
+			testClassName = this.getClass().getSimpleName();
+			
+			// Start video recording
+			try {
+				String videoDir = VideoRecorder.getDefaultVideoDir();
+				VideoRecorder.startRecording(testClassName, videoDir);
+				logger.info("Video recording started for test class: " + testClassName);
+			} catch (Exception e) {
+				logger.warn("Failed to start video recording: " + e.getMessage());
+				logger.warn("Tests will continue without video recording.");
+			}
 			
 			// Check if driver is already initialized and session is still valid
 			if (driver != null) {
@@ -222,6 +238,16 @@ public class BaseClass {
 		@AfterClass(groups= {"Sanity","Regression","Master"})
 		public void tearDown()
 		{
+			// Stop video recording
+			try {
+				String videoPath = VideoRecorder.stopRecording();
+				if (videoPath != null) {
+					logger.info("Video recording saved: " + videoPath);
+				}
+			} catch (Exception e) {
+				logger.warn("Error stopping video recording: " + e.getMessage());
+			}
+			
 			driver.close();
 			// Don't quit driver here - we need it for subsequent test classes
 			// Driver will be closed in @AfterSuite after all tests complete
@@ -231,6 +257,18 @@ public class BaseClass {
 		@AfterSuite(groups= {"Sanity","Regression","Master"})
 		public void closeDriver()
 		{
+			// Ensure video recording is stopped if still running
+			try {
+				if (VideoRecorder.isRecording()) {
+					String videoPath = VideoRecorder.stopRecording();
+					if (videoPath != null) {
+						logger.info("Final video recording saved: " + videoPath);
+					}
+				}
+			} catch (Exception e) {
+				logger.warn("Error stopping video recording in AfterSuite: " + e.getMessage());
+			}
+			
 			// Close driver only after all tests in suite are complete
 			if (driver != null) {
 				try {
