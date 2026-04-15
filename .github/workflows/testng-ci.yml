@@ -1,0 +1,78 @@
+name: TestNG Selenium CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        java-version: [11]
+        browser: [chrome]
+    
+    steps:
+    - name: 🔄 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: ☕ Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        
+    - name: 📦 Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: 🌐 Setup Chrome
+      uses: browser-actions/setup-chrome@latest
+      
+    - name: 🔨 Build with Maven
+      run: mvn clean compile test-compile
+      
+    - name: 🧪 Run Sanity Tests
+      run: mvn test -Dsurefire.suiteXmlFiles=simple-no-listener-test.xml -Dgroups=Sanity
+      continue-on-error: true
+      
+    - name: 🎯 Run Master Tests
+      run: mvn test -Dsurefire.suiteXmlFiles=master.xml -Dgroups=Master
+      continue-on-error: true
+      
+    - name: 📊 Publish Test Results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: TestNG Results
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
+        
+    - name: 📋 Upload Test Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: |
+          target/surefire-reports/
+          reports/
+          screenshots/
+          logs/
+          
+    - name: 💬 Comment PR
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🤖 TestNG tests completed! Check the Actions tab for detailed results.'
+          })

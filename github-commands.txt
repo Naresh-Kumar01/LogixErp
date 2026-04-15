@@ -1,0 +1,35 @@
+GITHUB PUSH COMMANDS
+====================
+
+IF YOU ALREADY HAVE A GITHUB REPO:
+----------------------------------
+git add .
+git commit -m "TestNG Automation Framework - Fixed classpath issues and cleaned project"
+git push origin main
+
+IF YOU NEED TO CREATE A NEW REPO:
+---------------------------------
+1. Go to GitHub.com and create a new repository
+2. Copy the repository URL (e.g., https://github.com/yourusername/your-repo-name.git)
+3. Run these commands:
+
+git init
+git add .
+git commit -m "Initial commit - TestNG Automation Framework"
+git remote add origin https://github.com/yourusername/your-repo-name.git
+git branch -M main
+git push -u origin main
+
+BEFORE PUSHING - UPDATE .gitignore:
+-----------------------------------
+Make sure these are in your .gitignore file:
+target/
+.apt_generated/
+.apt_generated_tests/
+test-output/
+allure-results/
+logs/
+*.log
+.DS_Store
+*.iml
+.idea/

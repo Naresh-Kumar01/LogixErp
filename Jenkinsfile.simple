@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+    
+    triggers {
+        githubPush()
+    }
+    
+    tools {
+        maven 'Maven'
+        jdk 'JDK-11'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '🔄 Checking out code...'
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                echo '🔨 Building project...'
+                sh 'mvn clean compile test-compile'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo '🧪 Running tests...'
+                sh 'mvn test -Dsurefire.suiteXmlFiles=simple-no-listener-test.xml'
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Publish test results
+            junit '**/target/surefire-reports/*.xml'
+            
+            // Archive artifacts
+            archiveArtifacts artifacts: 'target/surefire-reports/**', allowEmptyArchive: true
+        }
+        
+        failure {
+            echo '❌ Tests failed!'
+        }
+        
+        success {
+            echo '✅ All tests passed!'
+        }
+    }
+}

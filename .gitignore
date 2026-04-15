@@ -1,0 +1,31 @@
+# Maven
+target/
+.apt_generated/
+.apt_generated_tests/
+
+# TestNG
+test-output/
+
+# Allure
+allure-results/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports (optional - remove if you want to keep reports in repo)
+reports/
+screenshots/
+
+# Temporary files
+*.tmp
+*.bak
