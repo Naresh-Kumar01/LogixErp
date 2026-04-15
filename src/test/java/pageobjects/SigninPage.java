@@ -1,7 +1,10 @@
 package pageobjects;
 
 import org.openqa.selenium.By;
+<<<<<<< HEAD
 import org.openqa.selenium.StaleElementReferenceException;
+=======
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -12,9 +15,12 @@ import java.time.Duration;
 import java.util.List;
 
 public class SigninPage extends BasePage {
+<<<<<<< HEAD
 	private static final By USERNAME_INPUT = By.xpath("//input[@name='username' or contains(@name,'user') or contains(@id,'user')]");
 	private static final By PASSWORD_INPUT = By.xpath("//input[@name='password' or contains(@name,'pass') or contains(@id,'pass')]");
 	private static final By SIGNIN_BUTTON = By.xpath("//button[normalize-space()='Sign in' or normalize-space()='Signin' or contains(normalize-space(),'Sign')]");
+=======
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 
 	public SigninPage(WebDriver driver) {
 		super(driver);
@@ -48,6 +54,7 @@ public class SigninPage extends BasePage {
 	
 	public void setusername(String username)
 	{
+<<<<<<< HEAD
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		for (int attempt = 1; attempt <= 2; attempt++) {
 			try {
@@ -62,10 +69,15 @@ public class SigninPage extends BasePage {
 				}
 			}
 		}
+=======
+		Username.clear();
+		Username.sendKeys(username);
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 	}
 	
 	public void setpassword(String password)
 	{
+<<<<<<< HEAD
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		for (int attempt = 1; attempt <= 2; attempt++) {
 			try {
@@ -80,10 +92,15 @@ public class SigninPage extends BasePage {
 				}
 			}
 		}
+=======
+		Password.clear();
+		Password.sendKeys(password);
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 	}
 	
 	public void clicksignin()
 	{
+<<<<<<< HEAD
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		for (int attempt = 1; attempt <= 2; attempt++) {
 			try {
@@ -97,20 +114,31 @@ public class SigninPage extends BasePage {
 				}
 			}
 		}
+=======
+		Signin.click();
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 	}
 	
 	// Clear username field
 	public void clearUsername() {
+<<<<<<< HEAD
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		WebElement usernameInput = wait.until(ExpectedConditions.presenceOfElementLocated(USERNAME_INPUT));
 		usernameInput.clear();
+=======
+		Username.clear();
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 	}
 	
 	// Clear password field
 	public void clearPassword() {
+<<<<<<< HEAD
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		WebElement passwordInput = wait.until(ExpectedConditions.presenceOfElementLocated(PASSWORD_INPUT));
 		passwordInput.clear();
+=======
+		Password.clear();
+>>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 	}
 	
 	// Clear both fields
