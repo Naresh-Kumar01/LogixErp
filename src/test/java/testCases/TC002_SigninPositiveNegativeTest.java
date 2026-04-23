@@ -26,34 +26,17 @@ public class TC002_SigninPositiveNegativeTest extends BaseClass {
 	public void setupTest() {
 		try {
 			logger.info("Setting up test...");
-<<<<<<< HEAD
 			Assert.assertNotNull(driver, "WebDriver is null. Ensure browser setup completed before running tests.");
 
 			// Always start from a clean unauthenticated state for each test.
 			driver.manage().deleteAllCookies();
 			driver.navigate().to(p.getProperty("appURL"));
 			logger.info("Navigated to app URL: " + driver.getCurrentUrl());
-=======
-			
-			// Check if we're already on login page, if not navigate to it
-			String currentUrl = driver.getCurrentUrl();
-			if (!currentUrl.toLowerCase().contains("login")) {
-				logger.info("Not on login page, navigating to application URL...");
-				driver.get(p.getProperty("appURL"));
-				logger.info("Current URL: " + driver.getCurrentUrl());
-			} else {
-				logger.info("Already on login page: " + currentUrl);
-			}
->>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 			
 			signinPage = new SigninPage(driver);
 			homePage = new HomePage(driver);
 			
-<<<<<<< HEAD
 			// Wait for login page elements to become available.
-=======
-			// Wait for page to load - try multiple selectors for username field
->>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 			try {
 				wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@name='username']")));
@@ -62,14 +45,9 @@ public class TC002_SigninPositiveNegativeTest extends BaseClass {
 				try {
 					wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[contains(@name,'user') or contains(@id,'user')]")));
 				} catch (Exception e2) {
-<<<<<<< HEAD
 					// Retry once after a hard refresh to handle redirect race conditions.
 					driver.navigate().refresh();
 					wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[contains(@name,'user') or contains(@id,'user')]")));
-=======
-					// If still not found, wait for page to be ready
-					Thread.sleep(2000);
->>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 				}
 			}
 			
@@ -77,12 +55,7 @@ public class TC002_SigninPositiveNegativeTest extends BaseClass {
 		} catch (Exception e) {
 			logger.error("Error in test setup: " + e.getMessage());
 			e.printStackTrace();
-<<<<<<< HEAD
 			throw new RuntimeException("Test setup failed", e);
-=======
-			// Don't fail here, let individual tests handle it
-			logger.warn("Test setup had issues, but continuing with test execution");
->>>>>>> 39f078d2457410d273f71c51854c8b423013057f
 		}
 	}
 	

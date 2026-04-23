@@ -29,10 +29,48 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import utilities.VideoRecorder;
 public class BaseClass {
-	public static WebDriver driver;
+	public WebDriver driver;
 	public Logger logger;  //Log4j
 	public Properties p;
 	private String testClassName;
+
+	/**
+	 * Build ChromeOptions with recommended args to avoid DevToolsActivePort and sandbox issues.
+	 */
+	private ChromeOptions getChromeOptions(String os) {
+		ChromeOptions options = new ChromeOptions();
+		// Basic recommended flags
+		options.addArguments("--remote-allow-origins=*");
+		options.addArguments("--disable-gpu");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--disable-extensions");
+		options.addArguments("--disable-popup-blocking");
+		options.addArguments("--start-maximized");
+		options.addArguments("--disable-infobars");
+
+		// Respect user-specified headless property (default false)
+		try {
+			String headless = (p != null) ? p.getProperty("headless", "false") : "false";
+			if (headless.equalsIgnoreCase("true")) {
+				// modern headless flag
+				options.addArguments("--headless=new");
+				options.addArguments("--window-size=1920,1080");
+			}
+		} catch (Exception e) {
+			// ignore if properties not available yet
+		}
+
+		// Allow overriding binary path via config property
+		if (p != null) {
+			String chromeBinary = p.getProperty("chromeBinary");
+			if (chromeBinary != null && !chromeBinary.isBlank()) {
+				options.setBinary(chromeBinary);
+			}
+		}
+
+		return options;
+	}
 	
 	@Parameters({"os","browser"})
 		@BeforeClass(groups= {"Sanity","Regression","Master"})
@@ -53,52 +91,6 @@ public class BaseClass {
 			} catch (Exception e) {
 				logger.warn("Failed to start video recording: " + e.getMessage());
 				logger.warn("Tests will continue without video recording.");
-			}
-			
-			// Check if driver is already initialized and session is still valid
-			if (driver != null) {
-				boolean isSessionValid = false;
-				try {
-					// Check if driver session is still valid by getting window handles
-					driver.getWindowHandles();
-					isSessionValid = true;
-				} catch (Exception e) {
-					// Driver session is invalid/null
-					logger.warn("Previous driver session is invalid or closed: " + e.getMessage());
-					logger.warn("Will create new driver session.");
-					driver = null; // Reset driver to null so it will be recreated
-				}
-				
-				// If session is valid, reuse it
-				if (isSessionValid) {
-					logger.info("Driver already initialized from previous test. Skipping browser setup and reusing existing session.");
-					logger.info("Continuing with existing browser session - user should already be signed in.");
-					// Load properties if not already loaded
-					if (p == null) {
-						p = new Properties();
-						try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-							if (inputStream != null) {
-								p.load(inputStream);
-								logger.info("Loaded config.properties from classpath");
-							} else {
-								try (FileReader file = new FileReader("./src//test//resources//config.properties")) {
-									p.load(file);
-									logger.info("Loaded config.properties from relative path");
-								}
-							}
-						} catch (IOException e) {
-							logger.error("Failed to load config.properties: " + e.getMessage());
-						}
-					}
-					// Set implicit wait for continuation (inside try to handle any exceptions)
-					try {
-						driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-					} catch (Exception e) {
-						logger.warn("Could not set implicit wait (session might be closing): " + e.getMessage());
-						// Don't reset driver here, just continue
-					}
-					return; // Skip browser setup if driver already exists and is valid - preserves signin session
-				}
 			}
 			
 			// Suppress Selenium java.util.logging messages
@@ -138,16 +130,17 @@ public class BaseClass {
 				
 				// browser - using modern Selenium 4.x approach
 				switch (browser.toLowerCase()) {
-				    case "chrome":
-				        ChromeOptions chromeOptions = new ChromeOptions();
-				        if(os.equalsIgnoreCase("linux")) {
-				            chromeOptions.setPlatformName("linux");
-				        } else if(os.equalsIgnoreCase("mac")) {
-				            chromeOptions.setPlatformName("mac");
-				        } else {
-				            chromeOptions.setPlatformName("windows");
-				        }
-				        capabilities = chromeOptions;
+									case "chrome":
+										ChromeOptions chromeOptions = getChromeOptions(os);
+										// set platform for remote grid if needed
+										if(os.equalsIgnoreCase("linux")) {
+											chromeOptions.setPlatformName("linux");
+										} else if(os.equalsIgnoreCase("mac")) {
+											chromeOptions.setPlatformName("mac");
+										} else {
+											chromeOptions.setPlatformName("windows");
+										}
+										capabilities = chromeOptions;
 				        break;
 				    case "edge":
 				        EdgeOptions edgeOptions = new EdgeOptions();
@@ -185,12 +178,12 @@ public class BaseClass {
 					logger.info("Successfully connected to Selenium Grid");
 				} catch (Exception e) {
 					logger.error("Failed to connect to Selenium Grid at " + gridHubURL + ": " + e.getMessage());
-					if (fallbackToLocal) {
+						if (fallbackToLocal) {
 						logger.warn("Falling back to local execution mode");
 						// Fallback to local execution
 						switch(browser.toLowerCase())
 						{
-						case "chrome" : driver=new ChromeDriver();
+						case "chrome" : driver=new ChromeDriver(getChromeOptions(os));
 						break;
 						
 						case "edge" : driver=new EdgeDriver();
@@ -215,7 +208,7 @@ public class BaseClass {
 				
 				switch(browser.toLowerCase())
 				{
-				case "chrome" : driver=new ChromeDriver();
+				case "chrome" : driver=new ChromeDriver(getChromeOptions(os));
 				break;
 				
 				case "edge" : driver=new EdgeDriver();
@@ -228,7 +221,7 @@ public class BaseClass {
 			}
 			
 				
-			// Navigate to application URL (only if driver was just created)
+			// Navigate to application URL
 			driver.manage().deleteAllCookies();
 			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 			driver.get(p.getProperty("appURL")); // reading url from properties file.
@@ -248,10 +241,16 @@ public class BaseClass {
 				logger.warn("Error stopping video recording: " + e.getMessage());
 			}
 			
-			driver.close();
-			// Don't quit driver here - we need it for subsequent test classes
-			// Driver will be closed in @AfterSuite after all tests complete
-			logger.info("Test class completed. Driver session will remain open for subsequent tests.");
+			if (driver != null) {
+				try {
+					driver.quit();
+					logger.info("Test class completed. Browser session closed.");
+				} catch (Exception e) {
+					logger.warn("Error while closing browser session in AfterClass: " + e.getMessage());
+				} finally {
+					driver = null;
+				}
+			}
 		}
 		
 		@AfterSuite(groups= {"Sanity","Regression","Master"})
