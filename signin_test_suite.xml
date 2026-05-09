@@ -13,7 +13,7 @@
     <parameter name="browser" value="chrome"/>
      
     <classes>
-      <class name="testCases.TC002_SigninPositiveNegativeTest">
+      <class name="testcases.TC002_SigninPositiveNegativeTest">
         <methods>
           <include name="test_Signin_With_Valid_Credentials"/>
           <include name="test_Signin_Username_Case_Insensitive"/>
@@ -28,7 +28,7 @@
     <parameter name="browser" value="chrome"/>
      
     <classes>
-      <class name="testCases.TC002_SigninPositiveNegativeTest">
+      <class name="testcases.TC002_SigninPositiveNegativeTest">
         <methods>
           <include name="test_Signin_Invalid_Username"/>
           <include name="test_Signin_Invalid_Password"/>

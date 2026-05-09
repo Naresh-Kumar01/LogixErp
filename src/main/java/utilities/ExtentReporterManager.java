@@ -78,8 +78,19 @@ public class ExtentReporterManager implements ITestListener {
 			node.log(Status.INFO, result.getThrowable().getMessage());
 		}
 		try {
-			String imgPath = new BaseClass().captureScreen(result.getName());
-			node.addScreenCaptureFromPath(imgPath);
+			Object instance = result.getInstance();
+			if (!(instance instanceof BaseClass)) {
+				node.log(Status.WARNING,
+						"Screenshot skipped: test instance is not BaseClass (listener cannot access driver).");
+			} else {
+				BaseClass base = (BaseClass) instance;
+				if (base.driver == null) {
+					node.log(Status.WARNING, "Screenshot skipped: WebDriver is null (failure may be in @BeforeClass).");
+				} else {
+					String imgPath = base.captureScreen(result.getName());
+					node.addScreenCaptureFromPath(imgPath);
+				}
+			}
 		} catch (IOException e) {
 			node.log(Status.WARNING, "Could not capture screenshot: " + e.getMessage());
 		}

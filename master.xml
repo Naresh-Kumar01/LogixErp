@@ -20,10 +20,10 @@
         </groups>
 
         <classes>
-            <class name="testCases.TC001_SigninTest"/>
-            <class name="testCases.TC002_SigninPositiveNegativeTest"/>
-            <class name="testCases.TC003_ProductCreationTest"/>
-            <class name="testCases.TC004_ProductCreationScenariosTest"/>
+            <class name="testcases.TC001_SigninTest"/>
+            <class name="testcases.TC002_SigninPositiveNegativeTest"/>
+            <class name="testcases.TC003_ProductCreationTest"/>
+            <class name="testcases.TC004_ProductCreationScenariosTest"/>
         </classes>
     </test>
 
@@ -39,9 +39,9 @@
         </groups>
 
         <classes>
-            <class name="testCases.TC002_SigninPositiveNegativeTest"/>
-            <class name="testCases.TC003_ProductCreationTest"/>
-            <class name="testCases.TC004_ProductCreationScenariosTest"/>
+            <class name="testcases.TC002_SigninPositiveNegativeTest"/>
+            <class name="testcases.TC003_ProductCreationTest"/>
+            <class name="testcases.TC004_ProductCreationScenariosTest"/>
         </classes>
     </test>
 
@@ -57,7 +57,7 @@
         </groups>
 
         <classes>
-            <class name="testCases.TC002_SigninPositiveNegativeTest"/>
+            <class name="testcases.TC002_SigninPositiveNegativeTest"/>
         </classes>
     </test>
 

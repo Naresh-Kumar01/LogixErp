@@ -301,8 +301,14 @@ public class BaseClass {
 		}
 		
 		public String captureScreen(String tname) throws IOException {
+			if (driver == null) {
+				throw new IOException("WebDriver is null; cannot capture screenshot");
+			}
+			if (!(driver instanceof TakesScreenshot)) {
+				throw new IOException("WebDriver does not implement TakesScreenshot");
+			}
 			String timeStamp = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
-					
+
 			TakesScreenshot takesScreenshot = (TakesScreenshot) driver;
 			File sourceFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
 			

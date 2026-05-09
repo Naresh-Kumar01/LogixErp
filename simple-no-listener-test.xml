@@ -6,7 +6,7 @@
     <parameter name="os" value="Windows"/>
     <parameter name="browser" value="chrome"/>
     <classes>
-      <class name="testCases.TC001_SigninTest"/>
+      <class name="testcases.TC001_SigninTest"/>
     </classes>
   </test>
 </suite>
