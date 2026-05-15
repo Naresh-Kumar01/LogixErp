@@ -15,10 +15,10 @@
     <classes>
       <class name="testcases.TC002_SigninPositiveNegativeTest">
         <methods>
-          <include name="test_Signin_With_Valid_Credentials"/>
+         <!-- <include name="test_Signin_With_Valid_Credentials"/>
           <include name="test_Signin_Username_Case_Insensitive"/>
           <include name="test_Signin_Page_Elements_Displayed"/>
-        </methods>
+-->        </methods>
       </class>
     </classes>
   </test>

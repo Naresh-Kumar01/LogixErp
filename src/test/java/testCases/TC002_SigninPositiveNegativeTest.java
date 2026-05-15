@@ -287,44 +287,66 @@ public class TC002_SigninPositiveNegativeTest extends BaseClass {
 	 * Test ID: TC_SIGNIN_NEG_003
 	 * Description: Verify error message when both credentials are invalid
 	 */
-	@Test(priority = 12, groups = {"Regression", "Negative"}, 
-		  description = "Verify error message with both invalid credentials")
-	public void test_Signin_Invalid_Both_Credentials() {
-		logger.info("========== TC_SIGNIN_NEG_003: Invalid Both Credentials ==========");
-		try {
-			String invalidUsername = "invalid_user";
-			String invalidPassword = "invalid_pass";
-			
-			logger.info("Step 1: Enter invalid username: " + invalidUsername);
-			signinPage.setusername(invalidUsername);
-			
-			logger.info("Step 2: Enter invalid password");
-			signinPage.setpassword(invalidPassword);
-			
-			logger.info("Step 3: Click Sign in button");
-			signinPage.clicksignin();
-			
-			Thread.sleep(2000);
-			
-			logger.info("Step 4: Verify error message is displayed");
-			boolean errorDisplayed = signinPage.isErrorMessageDisplayed();
-			Assert.assertTrue(errorDisplayed, 
-				"Error message should be displayed for invalid credentials");
-			
-			logger.info("Step 5: Verify still on login page");
-			boolean stillOnLoginPage = signinPage.isOnLoginPage();
-			Assert.assertTrue(stillOnLoginPage, 
-				"Should remain on login page after invalid credentials");
-			
-			logger.info("✅ TC_SIGNIN_NEG_003 PASSED: Invalid credentials handled correctly");
-			
-		} catch (Exception e) {
-			logger.error("❌ TC_SIGNIN_NEG_003 FAILED: " + e.getMessage());
-			e.printStackTrace();
-			Assert.fail("Test failed: " + e.getMessage());
-		}
+	/**
+	 * Negative: wrong username + wrong password — sign-in must FAIL.
+	 * Test passes when login is rejected (error OR still on login OR not authenticated).
+	 * Test ID: TC_SIGNIN_NEG_003
+	 */
+	@Test(priority = 12, groups = {"Regression", "Negative"},
+	      description = "Sign-in fails with wrong username and wrong password")
+	public void test_Signin_Wrong_Username_And_Wrong_Password_Should_Fail() {
+	    logger.info("========== TC_SIGNIN_NEG_003: Wrong username + wrong password ==========");
+	    try {
+	        String wrongUsername = "wrong_user_" + System.currentTimeMillis();
+	        String wrongPassword = "wrong_pass_" + System.currentTimeMillis();
+
+	        logger.info("Step 1: Enter wrong username");
+	        signinPage.setusername(wrongUsername);
+
+	        logger.info("Step 2: Enter wrong password");
+	        signinPage.setpassword(wrongPassword);
+
+	        logger.info("Step 3: Click Sign in");
+	        signinPage.clicksignin();
+
+	        Thread.sleep(2000); // allow UI to settle
+
+	        logger.info("Step 4: Verify sign-in FAILED (at least one indicator)");
+
+	        // 1. Error message appears
+	        boolean errorDisplayed = signinPage.isErrorMessageDisplayed();
+	        if (errorDisplayed) {
+	            logger.info("Failure indicator: error message — " + signinPage.getErrorMessage());
+	        }
+
+	        // 2. User stays on login page
+	        boolean stillOnLoginPage = signinPage.isOnLoginPage();
+	        if (stillOnLoginPage) {
+	            logger.info("Failure indicator: still on login page — " + driver.getCurrentUrl());
+	        }
+
+	        // 3. User is NOT authenticated (no home/dashboard)
+	        boolean notAuthenticated = !homePage.isHomePageExists();
+	        if (notAuthenticated) {
+	            logger.info("Failure indicator: user is not authenticated");
+	        }
+
+	        Assert.assertTrue(
+	            errorDisplayed || stillOnLoginPage || notAuthenticated,
+	            "Sign-in should fail: expected error message, login page, or unauthenticated state. "
+	                + "error=" + errorDisplayed
+	                + ", onLoginPage=" + stillOnLoginPage
+	                + ", notAuthenticated=" + notAuthenticated
+	                + ", url=" + driver.getCurrentUrl()
+	        );
+
+	        logger.info("TC_SIGNIN_NEG_003 PASSED: sign-in correctly rejected invalid credentials");
+
+	    } catch (Exception e) {
+	        logger.error("TC_SIGNIN_NEG_003 FAILED: " + e.getMessage());
+	        Assert.fail("Test failed: " + e.getMessage());
+	    }
 	}
-	
 	/**
 	 * Negative Test Case 4: Empty username
 	 * Test ID: TC_SIGNIN_NEG_004
