@@ -1,0 +1,7 @@
+{
+  "scenarios": [
+    { "username": "admin", "password": "logixerp", "expected": "success" },
+    { "username": "invalid", "password": "logixerp", "expected": "failure" },
+    { "username": "admin", "password": "wrong", "expected": "failure" }
+  ]
+}

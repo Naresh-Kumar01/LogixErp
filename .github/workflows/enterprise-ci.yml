@@ -1,0 +1,51 @@
+name: LogixERP Enterprise CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 3 * * 1-5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [ chrome, firefox ]
+        suite: [ testng.xml, signin_test_suite.xml ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run TestNG suite
+        working-directory: LogixErp-main
+        run: mvn -B test -DsuiteFile=${{ matrix.suite }} -Dbrowser=${{ matrix.browser }} -Dheadless=true -Denv=qa
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ matrix.browser }}-${{ matrix.suite }}
+          path: |
+            LogixErp-main/reports/
+            LogixErp-main/screenshots/
+            LogixErp-main/target/surefire-reports/
+            LogixErp-main/target/allure-results/
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        working-directory: LogixErp-main
+        run: docker build -t logixerp-automation:ci .

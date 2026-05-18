@@ -1,150 +1,131 @@
-# 🚀 LogixERP Automation Framework
+# LogixERP WMS Enterprise Automation Framework
 
-## 📌 Overview
+Enterprise-grade **Selenium 4 + Java 17 + TestNG + Maven** automation framework for [LogixERP](https://logixerp.com) logistics, WMS, and supply chain flows.
 
-This project is a scalable and maintainable **Test Automation Framework** built using **Java, Selenium, TestNG, and Maven**.
-It follows a **Hybrid Framework Design (Page Object Model + Data Driven + Utility-based approach)**.
+## Application flow
 
-The framework is designed with industry best practices to support:
+`Login → WMS → Product Creation → Put Away → Picking → Inventory → Dispatch`
 
-* Cross-browser testing
-* Parallel execution
-* CI/CD integration
-* Detailed reporting
+## Tech stack
 
----
+| Layer | Tools |
+|--------|--------|
+| UI | Selenium WebDriver 4, Page Object Model |
+| Tests | TestNG, parallel execution, retry analyzer |
+| Build | Maven, Java 17 |
+| Data | Excel (POI), JSON, CSV, JavaFaker |
+| API | REST Assured |
+| DB | JDBC (MySQL / PostgreSQL) |
+| Reports | Extent Reports, Allure |
+| Logging | Log4j2 |
+| CI/CD | Jenkins, GitHub Actions, Docker |
 
-## 🏗️ Framework Architecture
-
-```
-src
- ├── main/java
- │    ├── base            → Test setup & teardown
- │    ├── pageobjects     → Page classes (POM)
- │    ├── utilities       → Reusable helpers
- │    ├── constants       → Framework constants
- │
- ├── test/java
- │    ├── testcases       → Test scripts
- │    ├── dataproviders   → Test data handling
- │    ├── listeners       → TestNG listeners
- │
- ├── test/resources
- │    ├── config.properties
- │    ├── testdata files
-```
-
----
-
-## ⚙️ Tech Stack
-
-* Language: Java
-* Automation: Selenium WebDriver
-* Test Runner: TestNG
-* Build Tool: Maven
-* Reporting: Extent Reports / Allure
-* CI/CD: Jenkins
-* Version Control: GitHub
-
----
-
-## ▶️ How to Run Tests
-
-### 🔹 Run via Maven
+## Project structure
 
 ```
-mvn clean test
+src/main/java
+├── annotations/     # @TestCase, @Role
+├── api/             # APIUtility (REST Assured)
+├── assertions/      # Soft assertions
+├── base/            # BaseTest
+├── config/          # ConfigReader, EnvironmentManager
+├── constants/       # FrameworkConstants
+├── database/        # DBUtility + sample SQL
+├── dataproviders/   # TestNG data providers
+├── drivers/         # Thread-safe DriverFactory
+├── enums/           # Browser, Environment, UserRole
+├── helpers/         # Wait, Screenshot, Assertion, Keyword engine
+├── listeners/       # TestListener
+├── locators/        # LocatorRepository (auto-heal aliases)
+├── models/          # Product, Picklist DTOs
+├── pages/           # Login, WMS, Product, Picking, Inventory, Dispatch
+├── reports/         # ExtentManager
+├── retry/           # RetryAnalyzer
+└── utilities/       # Excel, JSON, CSV, Faker, Video, Log
+
+src/test/java/tests
+├── auth/            # 10 login scenarios
+├── product/         # Product creation scenarios
+├── picking/         # FIFO, FEFO, ASN, picking rules
+├── serial/          # Serial product flows
+├── batch/           # Batch product flows
+├── negative/        # Negative / edge cases
+├── api/             # REST API samples
+└── database/        # JDBC validation samples
 ```
 
-### 🔹 Run specific suite
+## Quick start
 
-```
-mvn clean test -DsuiteXmlFile=testng.xml
-```
-
----
-
-## 🌐 Cross Browser Execution
-
-Set browser in `testng.xml`:
-
-```xml
-<parameter name="browser" value="chrome"/>
+```bash
+cd LogixErp-main
+mvn clean test -DsuiteFile=testng.xml -Dbrowser=chrome -Denv=qa
 ```
 
-Supported:
+### Run by group
 
-* Chrome
-* Firefox
+```bash
+mvn test -DsuiteFile=testng.xml -Dgroups=Sanity
+mvn test -DsuiteFile=testng.xml -Dgroups=Login
+mvn test -DsuiteFile=testng.xml -Dgroups=API
+```
 
----
+### Cross-browser
 
-## 📊 Test Execution Strategy
+```bash
+mvn test -Dbrowser=firefox
+mvn test -Dbrowser=edge
+```
 
-### ✔️ Sanity Suite
+### Headless / remote grid
 
-* Covers critical functionalities
-* Fast execution
-* Used for build validation
+```bash
+mvn test -Dheadless=true
+mvn test -Dexecution_env=remote -DgridHubURL=http://localhost:4444/wd/hub
+```
 
-### ✔️ Regression Suite
+### Allure report
 
-* Full application coverage
-* Executed before release
-* Ensures stability
+```bash
+mvn test allure:report
+mvn allure:serve
+```
 
----
+## Configuration
 
-## 📂 Data Driven Testing
+Edit `src/test/resources/config.properties`:
 
-* Test data managed via Excel / external files
-* DataProviders used for parameterization
+- `appURL`, `username`, `password`
+- `execution_env` = `local` | `remote` | `cloud`
+- `retry.count`, `video.recording.enabled`
+- `db.enabled`, `api.baseURL`
 
----
+Override at runtime: `-Denv=uat -Dusername=admin -Dpassword=***`
 
-## 📸 Reporting
+## CI/CD
 
-* Extent Reports for HTML reporting
-* Screenshots captured on failure
+- **Jenkins**: `Jenkinsfile` (scheduled + parameterized)
+- **GitHub Actions**: `.github/workflows/enterprise-ci.yml`
+- **Docker**: `docker build -t logixerp-automation .`
 
----
+## Framework features
 
-## 🔁 Parallel Execution
+- Hybrid UI + API + DB validation
+- Parallel TestNG execution
+- Retry failed tests (`RetryAnalyzer`)
+- Screenshot on failure (`TestListener`)
+- Video recording (optional)
+- Role-based and data-driven login
+- Keyword-driven `KeywordEngine`
+- Locator auto-heal via `LocatorRepository`
+- Thread-safe `DriverFactory`
 
-* Enabled via TestNG
-* Thread-safe driver using ThreadLocal
+## Notes for enterprise environments
 
----
+1. WMS locators are template XPath selectors—refine against your tenant UI (beta/alpha/UAT).
+2. DB tests are **disabled by default** (`db.enabled=false`); enable after schema mapping.
+3. API endpoints are samples; align paths with LogixERP OpenAPI/Swagger for your deployment.
+4. Legacy tests remain under `testcases.*` and `pageobjects.*` for backward compatibility.
 
-## 🔄 CI/CD Integration
+## Author
 
-* Integrated with Jenkins pipeline
-* Automated test execution on code commit
-
----
-
-## 🧠 Key Features
-
-* Thread-safe WebDriver management
-* Reusable utilities
-* Scalable architecture
-* Clean separation of concerns
-* Easy maintenance & extension
-
----
-
-## 🚧 Future Enhancements
-
-* Docker + Selenium Grid integration
-* API automation support
-* Cloud execution (AWS)
-* Advanced reporting dashboards
-
----
-
-## 👨‍💻 Author
-
-Naresh Kumar
-Automation Test Engineer
-
----
+Built for logistics/WMS/ERP regression automation on LogixERP.

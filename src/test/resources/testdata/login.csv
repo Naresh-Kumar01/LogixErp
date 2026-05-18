@@ -1,0 +1,4 @@
+username,password,expected
+admin,logixerp,success
+bad_user,logixerp,failure
+admin,bad_pass,failure

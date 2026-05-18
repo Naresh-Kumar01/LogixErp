@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="LogixERP Enterprise Suite" verbose="2" parallel="tests" thread-count="3">
+
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+        <listener class-name="utilities.ExtentReporterManager"/>
+    </listeners>
+
+    <parameter name="os" value="Windows"/>
+    <parameter name="browser" value="chrome"/>
+
+    <test name="Login Automation">
+        <groups>
+            <run>
+                <include name="Login"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.auth.LoginAutomationTest"/>
+        </classes>
+    </test>
+
+    <test name="Product Creation">
+        <groups>
+            <run>
+                <include name="Product"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.product.ProductCreationAutomationTest"/>
+        </classes>
+    </test>
+
+    <test name="Picking Rules and FIFO/FEFO/ASN">
+        <groups>
+            <run>
+                <include name="Picking"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.picking.PickingRulesAutomationTest"/>
+            <class name="tests.picking.FIFOAutomationTest"/>
+            <class name="tests.picking.FEFOAutomationTest"/>
+            <class name="tests.picking.ASNBasedPickingTest"/>
+        </classes>
+    </test>
+
+    <test name="Serial and Batch">
+        <groups>
+            <run>
+                <include name="Serial"/>
+                <include name="Batch"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.serial.SerialProductAutomationTest"/>
+            <class name="tests.batch.BatchProductAutomationTest"/>
+        </classes>
+    </test>
+
+    <test name="Negative Scenarios">
+        <groups>
+            <run>
+                <include name="Negative"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.negative.NegativeScenariosTest"/>
+        </classes>
+    </test>
+
+    <test name="API Automation">
+        <groups>
+            <run>
+                <include name="API"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.api.LogixERPApiAutomationTest"/>
+        </classes>
+    </test>
+
+    <test name="Legacy Signin Suite">
+        <classes>
+            <class name="testcases.TC002_SigninPositiveNegativeTest"/>
+        </classes>
+    </test>
+
+</suite>
